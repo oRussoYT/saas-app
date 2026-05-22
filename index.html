@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N9NE APP — </title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root {
+  --bg:#0b0b0f;--bg2:#13131a;--bg3:#1a1a24;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#f0f0f5;--muted:#7a7a9a;
+  --accent:#a78bfa;--accent2:#7c3aed;
+  --green:#34d399;--yellow:#fbbf24;--red:#f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+/* ======= LOGIN ======= */
+#loginScreen {
+  position:fixed;inset:0;z-index:1000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.particles {position:absolute;inset:0;overflow:hidden;}
+.particle {
+  position:absolute;border-radius:50%;
+  animation:float linear infinite;
+  opacity:0;
+}
+@keyframes float {
+  0%{transform:translateY(100vh) translateX(0) scale(0);opacity:0;}
+  10%{opacity:0.6;}
+  90%{opacity:0.3;}
+  100%{transform:translateY(-10vh) translateX(80px) scale(1.2);opacity:0;}
+}
+.glow-ring {
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(167,139,250,0.15);
+  animation:pulse-ring 4s ease-in-out infinite;
+}
+@keyframes pulse-ring {
+  0%,100%{transform:scale(1);opacity:0.3;}
+  50%{transform:scale(1.08);opacity:0.6;}
+}
+.login-box {
+  position:relative;z-index:10;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:40px 36px;
+  width:100%;max-width:400px;
+  animation:slideUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes slideUp {
+  from{opacity:0;transform:translateY(40px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.login-logo {
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin-bottom:32px;
+}
+.login-logo-icon {
+  width:52px;height:52px;background:var(--accent2);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;color:#fff;letter-spacing:-1px;
+  box-shadow:0 0 30px rgba(124,58,237,0.4);
+  animation:logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+  0%,100%{box-shadow:0 0 20px rgba(124,58,237,0.4);}
+  50%{box-shadow:0 0 40px rgba(124,58,237,0.7);}
+}
+.login-logo-text h2 {font-size:22px;font-weight:700;letter-spacing:-0.5px;}
+.login-logo-text p {font-size:12px;color:var(--muted);margin-top:2px;}
+.login-title {font-size:14px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:24px;text-transform:uppercase;letter-spacing:1px;}
+.login-field {margin-bottom:14px;}
+.login-field label {font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:6px;}
+.login-field input {
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);
+  font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color 0.2s;
+}
+.login-field input:focus {border-color:var(--accent);}
+.login-btn {
+  width:100%;margin-top:20px;padding:14px;
+  background:var(--accent2);color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;font-family:'Space Grotesk',sans-serif;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+}
+.login-btn:hover {background:#6d28d9;transform:translateY(-1px);}
+.login-btn:active {transform:translateY(0);}
+.login-err {
+  background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);
+  color:#fca5a5;font-size:12px;padding:10px 14px;border-radius:8px;
+  margin-top:12px;text-align:center;display:none;
+}
+.login-footer-txt {font-size:11px;color:var(--muted);text-align:center;margin-top:20px;}
+
+/* ======= DASHBOARD ======= */
+#dashboard {display:none;}
+.header {
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.logo {display:flex;align-items:center;gap:12px;}
+.logo-icon {width:40px;height:40px;background:var(--accent2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
+.logo-text h1 {font-size:17px;font-weight:700;letter-spacing:-0.3px;}
+.logo-text p {font-size:11px;color:var(--muted);}
+.header-right {display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.badge {font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid;}
+.badge-p{background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.3);}
+.badge-g{background:rgba(52,211,153,0.1);color:#34d399;border-color:rgba(52,211,153,0.25);}
+.badge-y{background:rgba(251,191,36,0.1);color:#fbbf24;border-color:rgba(251,191,36,0.25);}
+.logout-btn {
+  background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);
+  color:#f87171;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 0.2s;
+}
+.logout-btn:hover {background:rgba(248,113,113,0.2);}
+.user-chip {
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:20px;padding:6px 12px;font-size:12px;color:var(--text);
+  display:flex;align-items:center;gap:6px;
+}
+.user-dot {width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+.tabs-wrap {background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;overflow-x:auto;scrollbar-width:none;}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tabs {display:flex;gap:0;}
+.tab {
+  padding:13px 18px;font-size:13px;font-weight:600;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;
+  background:none;border-left:none;border-right:none;border-top:none;
+  transition:all 0.2s;font-family:'Space Grotesk',sans-serif;
+}
+.tab.on {color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.on){color:var(--text);}
+
+.content {padding:24px 28px;max-width:960px;margin:0 auto;}
+.sec {display:none;}
+.sec.on {display:block;}
+
+.kgrid {display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+.kcard {background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.kcard::before {content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--accent2);}
+.kcard.green::before{background:var(--green);}
+.kcard.yellow::before{background:var(--yellow);}
+.kcard.red::before{background:var(--red);}
+.kcard .lbl {font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.kcard .val {font-size:24px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.5px;}
+.kcard .sub {font-size:11px;color:var(--muted);margin-top:5px;}
+
+.card {background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:14px;}
+.card h3 {font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-0.2px;}
+.card .sub {font-size:12px;color:var(--muted);margin-bottom:16px;}
+
+.srow {display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.srow:last-child{border-bottom:none;}
+.srow .sl{color:var(--muted);}
+.srow .sv{font-weight:600;color:var(--text);}
+.srow .sv.green{color:var(--green);}
+
+.funnel-step{margin-bottom:11px;}
+.funnel-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.funnel-label .fl{color:var(--muted);}
+.funnel-label .fr{font-weight:600;color:var(--text);}
+.bar-track{background:var(--bg3);border-radius:6px;height:30px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:600;}
+
+.step-list{display:grid;gap:13px;}
+.step{display:flex;gap:13px;align-items:flex-start;}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step-body .title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.step-body .desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid;letter-spacing:0.3px;text-transform:uppercase;}
+
+.msg-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:7px;}
+.msg-bubble{background:var(--bg3);border:1px solid var(--border);border-radius:14px 14px 14px 2px;padding:13px 15px;font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px;}
+.msg-block{margin-bottom:18px;}
+
+.obj-block{margin-bottom:18px;}
+.obj-q{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:10px 13px;font-size:13px;font-weight:600;color:#fca5a5;margin-bottom:7px;}
+.obj-a{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--text);line-height:1.7;}
+
+.alert{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:12px 15px;font-size:13px;color:#fde68a;display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;line-height:1.6;}
+
+.legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:11px;font-size:12px;color:var(--muted);}
+.legend span{display:flex;align-items:center;gap:5px;}
+.ldot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+.footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:14px;}
+
+/* ======= IA CHAT ======= */
+#iaScreen {display:none;}
+#iaScreen.on {display:block;}
+.ia-wrap {max-width:800px;margin:0 auto;padding:24px 28px;}
+.ia-header {display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.ia-header h2 {font-size:18px;font-weight:700;}
+.ia-header p {font-size:12px;color:var(--muted);margin-top:2px;}
+.ia-badge {background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:#34d399;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.chat-box {
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  height:420px;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  margin-bottom:12px;scroll-behavior:smooth;
+}
+.chat-box::-webkit-scrollbar{width:4px;}
+.chat-box::-webkit-scrollbar-track{background:transparent;}
+.chat-box::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.msg-ia, .msg-user {max-width:82%;border-radius:14px;padding:11px 14px;font-size:13px;line-height:1.7;}
+.msg-ia {background:var(--bg3);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-radius:14px 14px 14px 2px;}
+.msg-user {background:var(--accent2);color:#fff;align-self:flex-end;border-radius:14px 14px 2px 14px;}
+.msg-ia .ia-label {font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+.chat-input-wrap {display:flex;gap:8px;}
+.chat-input-wrap input {
+  flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;
+  padding:12px 14px;font-size:13px;color:var(--text);font-family:'Space Grotesk',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.chat-input-wrap input:focus {border-color:var(--accent);}
+.send-btn {
+  background:var(--accent2);color:#fff;border:none;border-radius:10px;
+  padding:12px 18px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;
+  cursor:pointer;transition:background 0.2s;white-space:nowrap;
+}
+.send-btn:hover{background:#6d28d9;}
+.send-btn:disabled{background:#3a2a5a;cursor:not-allowed;}
+.typing-indicator {display:none;align-self:flex-start;}
+.typing-indicator.show{display:flex;}
+.typing-dots {display:flex;gap:4px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:14px 14px 14px 2px;}
+.typing-dots span {width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingBounce 1.2s ease-in-out infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* ======= ADMIN ======= */
+#adminScreen {display:none;}
+#adminScreen.on {display:block;}
+.admin-wrap {max-width:700px;margin:0 auto;padding:24px 28px;}
+.admin-header {margin-bottom:20px;}
+.admin-header h2 {font-size:18px;font-weight:700;}
+.admin-header p {font-size:12px;color:var(--muted);margin-top:2px;}
+.user-list {display:grid;gap:10px;margin-bottom:20px;}
+.user-item {
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.user-item-info {display:flex;align-items:center;gap:12px;}
+.user-avatar {width:36px;height:36px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.user-item-name {font-size:14px;font-weight:600;color:var(--text);}
+.user-item-role {font-size:11px;color:var(--muted);}
+.del-btn {background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:#f87171;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all 0.15s;}
+.del-btn:hover{background:rgba(248,113,113,0.2);}
+.admin-tag {background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;font-size:10px;font-weight:700;padding:3px 7px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;}
+.new-user-form {background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+.new-user-form h3 {font-size:14px;font-weight:700;margin-bottom:14px;}
+.form-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.form-field label {font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;}
+.form-field input, .form-field select {
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 12px;font-size:13px;color:var(--text);font-family:'Space Grotesk',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.form-field input:focus, .form-field select:focus {border-color:var(--accent);}
+.form-field select option {background:var(--bg2);}
+.create-btn {background:var(--accent2);color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:background 0.2s;}
+.create-btn:hover{background:#6d28d9;}
+.success-msg {background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:#34d399;font-size:12px;padding:10px 13px;border-radius:8px;margin-top:10px;display:none;}
+
+@media(max-width:600px){
+  .header,.tabs-wrap,.content,.ia-wrap,.admin-wrap{padding-left:16px;padding-right:16px;}
+  .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ======= LOGIN SCREEN ======= -->
+<div id="loginScreen">
+  <div class="particles" id="particles"></div>
+  <div class="glow-ring" style="width:500px;height:500px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+  <div class="glow-ring" style="width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:2s;"></div>
+  <div class="glow-ring" style="width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:1s;"></div>
+
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">N9</div>
+      <div class="login-logo-text">
+        <h2>N9NE Digital</h2>
+        <p>Performance digital para negócios reais</p>
+      </div>
+    </div>
+    <div class="login-title">Acesso ao painel</div>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input type="text" id="loginUser" placeholder="Seu nome de usuário" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="loginPass" placeholder="Sua senha" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Entrar no painel</button>
+    <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+    <div class="login-footer-txt">N9NE Digital Studio · Alexânia, GO</div>
+  </div>
+</div>
+
+<!-- ======= DASHBOARD ======= -->
+<div id="dashboard">
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">N9</div>
+    <div class="logo-text">
+      <h1>N9NE Digital</h1>
+      <p>Metas, Funil e Scripts de Vendas</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-p">2 sócios</span>
+    <span class="badge badge-g">Sites + Tráfego</span>
+    <span class="badge badge-y">Meta R$ 7.500/mês</span>
+    <div class="user-chip"><div class="user-dot"></div><span id="userLabel">Lucas Alves</span></div>
+    <button class="logout-btn" onclick="doLogout()">Sair</button>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab on" onclick="sw('metas',this)">Metas mensais</button>
+    <button class="tab" onclick="sw('funil',this)">Funil da empresa</button>
+    <button class="tab" onclick="sw('script',this)">Script de abordagem</button>
+    <button class="tab" onclick="sw('objecoes',this)">Objeções comuns</button>
+    <button class="tab" onclick="sw('ia',this)">IA Assistente</button>
+    <button class="tab" id="adminTab" onclick="sw('admin',this)" style="display:none;">Gerenciar usuários</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- METAS -->
+  <div id="s-metas" class="sec on">
+    <div class="kgrid">
+      <div class="kcard green"><div class="lbl">Meta de faturamento</div><div class="val">R$ 7.500</div><div class="sub">centro da faixa R$5k–10k</div></div>
+      <div class="kcard"><div class="lbl">Clientes ativos</div><div class="val">4–5</div><div class="sub">ticket médio R$ 1.750</div></div>
+      <div class="kcard yellow"><div class="lbl">Novos contratos/mês</div><div class="val">2</div><div class="sub">para crescer a base</div></div>
+      <div class="kcard"><div class="lbl">Reuniões necessárias</div><div class="val">8–10</div><div class="sub">conv. média 20–25%</div></div>
+    </div>
+    <div class="card">
+      <h3>Como chegar em R$ 7.500/mês</h3>
+      <div class="sub">Combinação de serviços recomendada para 2 pessoas</div>
+      <div class="srow"><span class="sl">3× Sites + Tráfego Pago</span><span class="sv">R$ 5.250</span></div>
+      <div class="srow"><span class="sl">1× Gestão Social Media</span><span class="sv">R$ 1.200</span></div>
+      <div class="srow"><span class="sl">1× Site avulso (pontual)</span><span class="sv">R$ 1.200</span></div>
+      <div class="srow"><span class="sl" style="font-weight:600;color:var(--text)">Total estimado</span><span class="sv green">R$ 7.650</span></div>
+    </div>
+    <div class="card">
+      <h3>Projeção de crescimento</h3>
+      <div class="sub">Adicionando 2 clientes por mês</div>
+      <div style="position:relative;width:100%;height:210px;">
+        <canvas id="growChart" role="img" aria-label="Projeção de faturamento N9NE Digital">Faturamento crescendo até R$14.000</canvas>
+      </div>
+      <div class="legend">
+        <span><span class="ldot" style="background:#a78bfa;"></span>Faturamento mensal</span>
+        <span><span class="ldot" style="background:transparent;border:1px dashed #34d399;"></span>Meta R$ 7.500</span>
+      </div>
+    </div>
+    <div class="alert"><div style="font-size:16px;flex-shrink:0;">⚠</div><div>Com 2 pessoas, o gargalo é tempo — não aceitem mais de 6 clientes simultâneos sem contratar ou automatizar.</div></div>
+  </div>
+
+  <!-- FUNIL -->
+  <div id="s-funil" class="sec">
+    <div class="card">
+      <h3>Funil de aquisição — N9NE Digital</h3>
+      <div class="sub">Do primeiro contato ao contrato assinado</div>
+      <div class="funnel-step"><div class="funnel-label"><span class="fl">Prospecção (contatos/mês)</span><span class="fr">40</span></div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#6d28d9;color:#ede9fe;">40 contatos prospectados</div></div></div>
+      <div class="funnel-step"><div class="funnel-label"><span class="fl">Respostas recebidas</span><span class="fr">20 — 50%</span></div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#7c3aed;color:#ede9fe;">20 respostas</div></div></div>
+      <div class="funnel-step"><div class="funnel-label"><span class="fl">Reuniões agendadas</span><span class="fr">10 — 25%</span></div><div class="bar-track"><div class="bar-fill" style="width:25%;background:#8b5cf6;color:#ede9fe;">10 reuniões</div></div></div>
+      <div class="funnel-step"><div class="funnel-label"><span class="fl">Propostas enviadas</span><span class="fr">7 — 70%</span></div><div class="bar-track"><div class="bar-fill" style="width:18%;background:#a78bfa;color:#1e1b4b;">7 propostas</div></div></div>
+      <div class="funnel-step"><div class="funnel-label"><span class="fl">Contratos fechados</span><span class="fr">2 — 28%</span></div><div class="bar-track"><div class="bar-fill" style="width:5%;background:#34d399;color:#022c22;">2</div></div></div>
+    </div>
+    <div class="card">
+      <h3>Onde prospectar</h3>
+      <div class="sub">Canais com maior ROI para agência pequena</div>
+      <div class="step-list">
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:#a78bfa;">1</div><div class="step-body"><div class="title">Instagram / DM direto</div><div class="desc">Analisar perfis de negócios locais. Mandar diagnóstico personalizado como isca de valor.</div><div class="tags"><span class="tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.3);">Orgânico</span><span class="tag" style="background:rgba(251,191,36,0.1);color:#fbbf24;border-color:rgba(251,191,36,0.25);">Rápido</span></div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(52,211,153,0.12);color:#34d399;">2</div><div class="step-body"><div class="title">Indicações de clientes ativos</div><div class="desc">Peça 1 indicação por cliente a cada 60 dias. Canal com maior conversão e custo zero.</div><div class="tags"><span class="tag" style="background:rgba(52,211,153,0.1);color:#34d399;border-color:rgba(52,211,153,0.25);">Alta conversão</span></div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(251,191,36,0.1);color:#fbbf24;">3</div><div class="step-body"><div class="title">Google Meu Negócio local</div><div class="desc">Negócios sem site ou com site ruim em Alexânia e Brasília são clientes em potencial imediato.</div><div class="tags"><span class="tag" style="background:rgba(251,191,36,0.1);color:#fbbf24;border-color:rgba(251,191,36,0.25);">Alta intenção</span></div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:#a78bfa;">4</div><div class="step-body"><div class="title">Conteúdo no próprio Instagram</div><div class="desc">Cases de resultado geram inbound. 2 posts de resultado por semana é suficiente.</div><div class="tags"><span class="tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;border-color:rgba(167,139,250,0.3);">Inbound</span></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Projeção do funil em números</h3>
+      <div class="sub">Com 40 contatos por mês e esforço consistente</div>
+      <div style="position:relative;width:100%;height:190px;">
+        <canvas id="funnelChart" role="img" aria-label="Funil de vendas N9NE Digital">40, 20, 10, 7, 2</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <div id="s-script" class="sec">
+    <div class="card">
+      <h3>Etapa 1 — Primeiro contato (DM)</h3>
+      <div class="sub">Mensagem inicial para prospects frios no Instagram</div>
+      <div class="msg-block">
+        <div class="msg-label">Mensagem principal</div>
+        <div class="msg-bubble">Olá, tudo bem? Sou da N9NE Digital, agência especializada em aumentar vendas pelo digital. Analisei o perfil d[o/a] <strong>[nome do negócio]</strong> e enxerguei um grande potencial para crescer as vendas, tanto no delivery quanto na loja. Preparei um diagnóstico completo e gostaria de apresentar para você. Podemos agendar uma conversa rápida?</div>
+      </div>
+      <div class="msg-block">
+        <div class="msg-label">Follow-up (se não responder em 48h)</div>
+        <div class="msg-bubble">Oi <strong>[nome]</strong>! Só passando para ver se chegou minha mensagem anterior. Separei algumas observações rápidas sobre o perfil de vocês que podem fazer diferença nas vendas. Vale 15 minutinhos?</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Etapa 2 — Estrutura da reunião (30–40 min)</h3>
+      <div class="sub">Roteiro para Zoom ou presencial</div>
+      <div class="step-list">
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:#a78bfa;">1</div><div class="step-body"><div class="title">Rapport — 5 min</div><div class="desc">"Me conta um pouco do negócio — como surgiu, quem é seu cliente hoje?" Deixe eles falarem. Anote tudo.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(248,113,113,0.12);color:#f87171;">2</div><div class="step-body"><div class="title">Diagnóstico — 15 min</div><div class="desc">Apresente o que encontrou: alcance baixo, bio sem CTA, tráfego sem funil. Use dados reais do perfil deles.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(52,211,153,0.12);color:#34d399;">3</div><div class="step-body"><div class="title">Solução — 10 min</div><div class="desc">Apresente o que a N9NE vai fazer: gestão de tráfego + conteúdo + funil. Mostre 1 case de resultado se tiver.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(251,191,36,0.1);color:#fbbf24;">4</div><div class="step-body"><div class="title">Fechamento — 10 min</div><div class="desc">"Você prefere receber a proposta hoje ainda ou amanhã?" — nunca pergunte <em>se</em> eles querem, mas <em>quando</em>.</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Etapa 3 — Estrutura da proposta</h3>
+      <div class="sub">O que mandar por PDF ou apresentação após a reunião</div>
+      <div class="srow"><span class="sl">1. Diagnóstico do perfil atual</span><span class="sv" style="font-size:12px;color:var(--muted);">o que está errado</span></div>
+      <div class="srow"><span class="sl">2. O que a N9NE vai fazer</span><span class="sv" style="font-size:12px;color:var(--muted);">serviços detalhados</span></div>
+      <div class="srow"><span class="sl">3. Projeção de resultados</span><span class="sv" style="font-size:12px;color:var(--muted);">números realistas</span></div>
+      <div class="srow"><span class="sl">4. Investimento mensal</span><span class="sv" style="font-size:12px;color:var(--muted);">valor + o que inclui</span></div>
+      <div class="srow"><span class="sl">5. CTA claro com prazo</span><span class="sv" style="font-size:12px;color:var(--green);">ex: "Assinar até sexta-feira"</span></div>
+    </div>
+  </div>
+
+  <!-- OBJEÇÕES -->
+  <div id="s-objecoes" class="sec">
+    <div class="card">
+      <h3>Objeções mais comuns</h3>
+      <div class="sub">Scripts prontos para não travar na hora H</div>
+      <div style="display:grid;gap:15px;margin-top:4px;">
+        <div class="obj-block"><div class="obj-q">💬 "Tá caro"</div><div class="obj-a">"Entendo! Mas pensa assim: se a gente trouxer só 3 clientes a mais por mês para você, já paga o investimento. A pergunta certa não é quanto custa — é quanto você deixa de ganhar sem isso."</div></div>
+        <div class="obj-block"><div class="obj-q">💬 "Vou pensar"</div><div class="obj-a">"Claro! Só me ajuda a entender: tem alguma dúvida específica que ficou? Às vezes consigo resolver agora mesmo e aí fica mais fácil de decidir."</div></div>
+        <div class="obj-block"><div class="obj-q">💬 "Já tentei e não funcionou"</div><div class="obj-a">"Faz todo sentido ter essa desconfiança. Me conta o que foi feito antes? Na maioria dos casos, o problema foi falta de funil e oferta. A gente resolve isso primeiro antes de investir."</div></div>
+        <div class="obj-block"><div class="obj-q">💬 "Não tenho verba agora"</div><div class="obj-a">"Entendo o momento. Posso te oferecer um plano de entrada mais enxuto — só gestão de conteúdo agora — e quando os primeiros resultados aparecerem, a gente escala juntos."</div></div>
+        <div class="obj-block"><div class="obj-q">💬 "Preciso falar com meu sócio/marido/esposa"</div><div class="obj-a">"Ótimo! Posso preparar um resumo visual da proposta para vocês revisarem juntos? Me passa o melhor horário para uma chamada com vocês dois?"</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Dica de ouro — pós reunião</h3>
+      <div class="sub">O que fazer nas 24h após a reunião</div>
+      <div class="step-list">
+        <div class="step"><div class="step-num" style="background:rgba(251,191,36,0.1);color:#fbbf24;">1</div><div class="step-body"><div class="title">Mande uma mensagem de agradecimento</div><div class="desc">"Foi ótimo conversar! Vou preparar a proposta e mando ainda hoje." — mantém o aquecimento.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:#a78bfa;">2</div><div class="step-body"><div class="title">Entregue a proposta em até 24h</div><div class="desc">Velocidade transmite profissionalismo. Quem demora 3 dias perde para quem é rápido.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(52,211,153,0.12);color:#34d399;">3</div><div class="step-body"><div class="title">Follow-up se não responder em 48h</div><div class="desc">"Oi [nome], chegou a proposta? Qualquer dúvida, estou aqui!" — sem pressão, só presença.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IA -->
+  <div id="s-ia" class="sec">
+    <div class="ia-wrap" style="padding:0;">
+      <div class="ia-header">
+        <div><h2>IA Assistente N9NE</h2><p>Tire dúvidas sobre marketing, vendas, funil e estratégia</p></div>
+        <span class="ia-badge">Online</span>
+      </div>
+      <div class="chat-box" id="chatBox">
+        <div class="msg-ia"><div class="ia-label">N9NE IA</div>Olá, <span id="iaUserName">Lucas</span>! Sou a IA da N9NE Digital. Pode me perguntar sobre estratégias de vendas, scripts, tráfego pago, funil de conversão, precificação ou qualquer dúvida do seu negócio. Como posso ajudar?</div>
+        <div class="typing-indicator" id="typingIndicator"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+      </div>
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Digite sua dúvida sobre marketing ou vendas..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="s-admin" class="sec">
+    <div class="admin-wrap" style="padding:0;">
+      <div class="admin-header"><h2>Gerenciar usuários</h2><p>Crie e gerencie acessos ao painel</p></div>
+      <div class="user-list" id="userList"></div>
+      <div class="new-user-form">
+        <h3>Criar novo acesso</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Nome completo</label><input type="text" id="newName" placeholder="Ex: João Silva"/></div>
+          <div class="form-field"><label>Usuário</label><input type="text" id="newUser" placeholder="Ex: joaosilva"/></div>
+          <div class="form-field"><label>Senha</label><input type="password" id="newPass" placeholder="Mínimo 6 caracteres"/></div>
+          <div class="form-field"><label>Nível de acesso</label>
+            <select id="newRole">
+              <option value="user">Usuário</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+        <button class="create-btn" onclick="createUser()">Criar usuário</button>
+        <div class="success-msg" id="successMsg">Usuário criado com sucesso!</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<div class="footer">N9NE Digital — Performance digital para negócios reais &nbsp;·&nbsp; @n9ne_digital</div>
+</div><!-- /dashboard -->
+
+<script>
+const USERS_KEY = 'n9ne_users';
+const SESS_KEY = 'n9ne_session';
+
+function getUsers() {
+  const d = localStorage.getItem(USERS_KEY);
+  if (d) return JSON.parse(d);
+  const def = [{ name:'Lucas Alves', username:'Lucas Alves', password:'Allveszzl__', role:'admin' }];
+  localStorage.setItem(USERS_KEY, JSON.stringify(def));
+  return def;
+}
+
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+function getSession() { const d = localStorage.getItem(SESS_KEY); return d ? JSON.parse(d) : null; }
+function saveSession(u) { localStorage.setItem(SESS_KEY, JSON.stringify(u)); }
+function clearSession() { localStorage.removeItem(SESS_KEY); }
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const users = getUsers();
+  const found = users.find(x => x.username === u && x.password === p);
+  if (found) {
+    saveSession(found);
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userLabel').textContent = found.name;
+    document.getElementById('iaUserName').textContent = found.name.split(' ')[0];
+    if (found.role === 'admin') {
+      document.getElementById('adminTab').style.display = 'block';
+    }
+    setTimeout(buildCharts, 100);
+  } else {
+    const err = document.getElementById('loginErr');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+
+function doLogout() {
+  clearSession();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// Auto-login if session exists
+window.addEventListener('load', () => {
+  const s = getSession();
+  if (s) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userLabel').textContent = s.name;
+    document.getElementById('iaUserName').textContent = s.name.split(' ')[0];
+    if (s.role === 'admin') document.getElementById('adminTab').style.display = 'block';
+    setTimeout(buildCharts, 100);
+  }
+  buildParticles();
+});
+
+// Particles
+function buildParticles() {
+  const c = document.getElementById('particles');
+  const colors = ['#a78bfa','#7c3aed','#34d399','#fbbf24'];
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 6 + 3;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;`;
+    c.appendChild(p);
+  }
+}
+
+// Tab switching
+function sw(id, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('s-' + id).classList.add('on');
+  btn.classList.add('on');
+  if (id === 'metas') setTimeout(buildCharts, 60);
+  if (id === 'funil') setTimeout(buildCharts, 60);
+  if (id === 'admin') renderUserList();
+}
+
+// Charts
+function buildCharts() {
+  if (!Chart.getChart('growChart') && document.querySelector('#s-metas.on')) {
+    new Chart(document.getElementById('growChart'), {
+      type:'line',
+      data:{
+        labels:['Hoje','Mês 1','Mês 2','Mês 3','Mês 4','Mês 5','Mês 6'],
+        datasets:[
+          {label:'Faturamento',data:[1750,3500,5250,7000,8750,10500,14000],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#a78bfa',pointRadius:5},
+          {label:'Meta',data:[7500,7500,7500,7500,7500,7500,7500],borderColor:'#34d399',borderDash:[6,4],pointRadius:0,borderWidth:2,fill:false}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'R$ '+v.raw.toLocaleString('pt-BR')}}},scales:{y:{ticks:{color:'#7a7a9a',callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.05)'}},x:{ticks:{color:'#7a7a9a'},grid:{display:false}}}}
+    });
+  }
+  if (!Chart.getChart('funnelChart') && document.querySelector('#s-funil.on')) {
+    new Chart(document.getElementById('funnelChart'), {
+      type:'bar',
+      data:{labels:['Contatos','Respostas','Reuniões','Propostas','Fechados'],datasets:[{label:'Volume',data:[40,20,10,7,2],backgroundColor:['rgba(109,40,217,0.7)','rgba(124,58,237,0.7)','rgba(139,92,246,0.7)','rgba(167,139,250,0.7)','rgba(52,211,153,0.85)'],borderRadius:6,borderSkipped:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#7a7a9a'},grid:{color:'rgba(255,255,255,0.05)'}},x:{ticks:{color:'#7a7a9a'},grid:{display:false}}}}
+    });
+  }
+}
+
+// IA Chat
+async function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  const box = document.getElementById('chatBox');
+  const typing = document.getElementById('typingIndicator');
+  const btn = document.getElementById('sendBtn');
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'msg-user';
+  userBubble.textContent = msg;
+  box.insertBefore(userBubble, typing);
+  box.scrollTop = box.scrollHeight;
+
+  btn.disabled = true;
+  typing.classList.add('show');
+  box.scrollTop = box.scrollHeight;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:'Você é a IA assistente da N9NE Digital, agência de marketing digital localizada em Alexânia, GO. Responda sempre em português brasileiro, de forma direta e prática. Foque em marketing digital, vendas, tráfego pago, funil de conversão, scripts de abordagem, gestão de redes sociais e estratégia para pequenas empresas. Seja objetivo, use linguagem profissional mas acessível. Não mencione que é Claude ou Anthropic — você é a IA da N9NE Digital.',
+        messages:[{role:'user',content:msg}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || 'Desculpe, não consegui processar sua pergunta. Tente novamente.';
+    typing.classList.remove('show');
+    const iaBubble = document.createElement('div');
+    iaBubble.className = 'msg-ia';
+    iaBubble.innerHTML = '<div class="ia-label">N9NE IA</div>' + text.replace(/\n/g,'<br>');
+    box.insertBefore(iaBubble, typing);
+    box.scrollTop = box.scrollHeight;
+  } catch(e) {
+    typing.classList.remove('show');
+    const errBubble = document.createElement('div');
+    errBubble.className = 'msg-ia';
+    errBubble.innerHTML = '<div class="ia-label">N9NE IA</div>Erro de conexão. Verifique sua internet e tente novamente.';
+    box.insertBefore(errBubble, typing);
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ci = document.getElementById('chatInput');
+  if (ci) ci.addEventListener('keydown', e => { if(e.key==='Enter') sendMsg(); });
+});
+
+// Admin
+function renderUserList() {
+  const users = getUsers();
+  const list = document.getElementById('userList');
+  list.innerHTML = '';
+  users.forEach((u, i) => {
+    const initials = u.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const item = document.createElement('div');
+    item.className = 'user-item';
+    item.innerHTML = `
+      <div class="user-item-info">
+        <div class="user-avatar">${initials}</div>
+        <div>
+          <div class="user-item-name">${u.name} ${u.role==='admin'?'<span class="admin-tag">Admin</span>':''}</div>
+          <div class="user-item-role">@${u.username}</div>
+        </div>
+      </div>
+      ${i>0 ? `<button class="del-btn" onclick="deleteUser(${i})">Remover</button>` : '<span style="font-size:11px;color:var(--muted);">Conta principal</span>'}
+    `;
+    list.appendChild(item);
+  });
+}
+
+function deleteUser(i) {
+  const users = getUsers();
+  users.splice(i, 1);
+  saveUsers(users);
+  renderUserList();
+}
+
+function createUser() {
+  const name = document.getElementById('newName').value.trim();
+  const username = document.getElementById('newUser').value.trim();
+  const password = document.getElementById('newPass').value;
+  const role = document.getElementById('newRole').value;
+  if (!name || !username || !password) return;
+  if (password.length < 6) { alert('Senha deve ter no mínimo 6 caracteres.'); return; }
+  const users = getUsers();
+  if (users.find(u => u.username === username)) { alert('Este usuário já existe.'); return; }
+  users.push({ name, username, password, role });
+  saveUsers(users);
+  document.getElementById('newName').value = '';
+  document.getElementById('newUser').value = '';
+  document.getElementById('newPass').value = '';
+  const s = document.getElementById('successMsg');
+  s.style.display = 'block';
+  setTimeout(() => s.style.display = 'none', 3000);
+  renderUserList();
+}
+</script>
+</body>
+</html>
